@@ -2,6 +2,9 @@ package a02;
 
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+import edu.princeton.cs.algs4.StdRandom;
 
 /**
  * A randomized queue is similar to a stack or queue, except that the 
@@ -10,15 +13,23 @@ import java.util.Iterator;
  *
  */
 public class RandomizedQueue<Item> {
+	private Item[] queue;
+	private int size;
+	private int first;
+	private int last;
 	
-	Deque<Item> randomQueue;
-	/**
+	//Deque<Item> randomQueue;
+	
+	 /**
 	 * Constructs an empty randomized queue.
 	 * 
 	 */
-	public RandomizedQueue() 
-	{
-		Deque<Item> randomQueue = new Deque<Item>();
+	@SuppressWarnings("unchecked")
+	public RandomizedQueue() {
+		queue = (Item[]) new Object[2];
+		size = 0;
+		first = 0;
+		last = 0;
 	}
 	
 	/**
@@ -27,7 +38,7 @@ public class RandomizedQueue<Item> {
 	 * 
 	 */
 	public boolean isEmpty() {
-	   return randomQueue.size() == 0; // 
+	   return size == 0; // 
 	}
 	
 	/**
@@ -36,7 +47,7 @@ public class RandomizedQueue<Item> {
 	 * 
 	 */
 	public int size() {
-	   return randomQueue.size();  // return the number of items on the queue
+	   return size;  // return the number of items on the queue
 	}
 	
 	/**
@@ -44,7 +55,14 @@ public class RandomizedQueue<Item> {
 	 * @param item
 	 */
 	public void enqueue(Item item) {
-	   randomQueue.addFirst(item);
+		if(item.equals(null)) {
+			throw new NullPointerException();
+		}
+		if(size == queue.length) {
+			resize(queue.length);
+		}
+		queue[size++] = item;
+	   //randomQueue.addFirst(item);
 	}
 	
 	/**
@@ -53,8 +71,20 @@ public class RandomizedQueue<Item> {
 	 * 
 	 */
 	public Item dequeue() {
-		return null; //TODO
-	  // delete and return a random item
+		if(isEmpty()) {
+			throw new NoSuchElementException("The queue is Empty.");
+		}
+		int index = randomQueueIndex();
+		Item element = queue[index];
+		queue[index] = queue[--size];
+		queue[size] = null;
+		queue[index] = null;
+		size--;
+		
+		if(size > 0 && size == queue.length/4) {
+			resize(queue.length/2);
+		}
+		return element;
 	}
 	
 	/**
@@ -81,6 +111,24 @@ public class RandomizedQueue<Item> {
 	 * RandomizedQueue Test Client
 	 * @param args
 	 */
+	//Helper Methods
+	
+	@SuppressWarnings("unchecked")
+	private void resize(int capacity) {
+		if(capacity >= size) {
+			Item[] temp = (Item[]) new Object[capacity];
+			for(int i = 0; i < size; i++) {
+				temp[i] = queue[(first + i) % queue.length];
+			}
+			queue = temp;
+			first = 0;
+			last = size;
+		}
+	}
+	
+	private int randomQueueIndex() {
+		return StdRandom.uniform(0, size);
+	}
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
