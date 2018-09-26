@@ -1,9 +1,7 @@
 package a02;
 
-import java.util.Deque;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-
 import edu.princeton.cs.algs4.StdRandom;
 
 /**
@@ -16,9 +14,6 @@ public class RandomizedQueue<Item> {
 	private Item[] queue;
 	private int size;
 	private int first;
-	private int last;
-	
-	//Deque<Item> randomQueue;
 	
 	 /**
 	 * Constructs an empty randomized queue.
@@ -29,7 +24,6 @@ public class RandomizedQueue<Item> {
 		queue = (Item[]) new Object[2];
 		size = 0;
 		first = 0;
-		last = 0;
 	}
 	
 	/**
@@ -43,7 +37,7 @@ public class RandomizedQueue<Item> {
 	
 	/**
 	 * Returns the number of items on the queue.
-	 * @return int 
+	 * @return 
 	 * 
 	 */
 	public int size() {
@@ -74,9 +68,9 @@ public class RandomizedQueue<Item> {
 		if(isEmpty()) {
 			throw new NoSuchElementException("The queue is Empty.");
 		}
-		int index = randomQueueIndex();
-		Item element = queue[index];
-		queue[index] = queue[--size];
+		int index = StdRandom.uniform(size);
+		Item item = queue[index];
+		queue[index] = queue[--size];			//to avoid loitering
 		queue[size] = null;
 		queue[index] = null;
 		size--;
@@ -84,7 +78,7 @@ public class RandomizedQueue<Item> {
 		if(size > 0 && size == queue.length/4) {
 			resize(queue.length/2);
 		}
-		return element;
+		return item;
 	}
 	
 	/**
@@ -93,7 +87,11 @@ public class RandomizedQueue<Item> {
 	 * 
 	 */
 	public Item sample() {
-		return null; // TODO
+		if(isEmpty()) {
+			throw new NoSuchElementException("The queue is Empty.");
+		}
+		int index = StdRandom.uniform(size);
+		return queue[index];
 		// return (but do not delete) a random item
 	}
 	
@@ -103,14 +101,47 @@ public class RandomizedQueue<Item> {
 	 * 
 	 */
 	public Iterator<Item> iterator() {
-		return null; //TODO
+		return new RandomizedQueueIterator();
 		// return an independent iterator over items in random order
 	}
+	
+	private class RandomizedQueueIterator implements Iterator<Item> {
+		private int index;
+		private int[] clonedIndices;
+		
+		public RandomizedQueueIterator() {
+			clonedIndices = new int[size];
+			for(int i = 0; i < queue.length; i++) {
+				clonedIndices[index] = i;
+			}
+			StdRandom.shuffle(clonedIndices);
+		}
+		@Override
+		public boolean hasNext() {
+			return index < size;
+		}
 
-	/**
-	 * RandomizedQueue Test Client
-	 * @param args
-	 */
+		@Override
+		public Item next() {
+			if(!hasNext()) {
+				throw new NoSuchElementException();
+			}
+			Item item = queue[clonedIndices[index]];
+			index++;
+			
+			return item;
+			
+		}
+		
+		@Override
+		public void remove() {
+	    	 throw new UnsupportedOperationException("Remove operation not supported"
+		    	 		+ " in this version.");  			
+		}
+		
+	}
+
+	
 	//Helper Methods
 	
 	@SuppressWarnings("unchecked")
@@ -122,16 +153,6 @@ public class RandomizedQueue<Item> {
 			}
 			queue = temp;
 			first = 0;
-			last = size;
 		}
 	}
-	
-	private int randomQueueIndex() {
-		return StdRandom.uniform(0, size);
-	}
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
-	}
-
 }
