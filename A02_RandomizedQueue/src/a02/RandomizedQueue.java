@@ -10,7 +10,7 @@ import edu.princeton.cs.algs4.StdRandom;
  * @author rjayb
  *
  */
-public class RandomizedQueue<Item> {
+public class RandomizedQueue<Item> implements Iterable<Item>{
 	private Item[] queue;
 	private int size;
 	private int first;
@@ -53,7 +53,7 @@ public class RandomizedQueue<Item> {
 			throw new NullPointerException();
 		}
 		if(size == queue.length) {
-			resize(queue.length);
+			resize(queue.length * 2);
 		}
 		queue[size++] = item;
 	   //randomQueue.addFirst(item);
@@ -72,8 +72,8 @@ public class RandomizedQueue<Item> {
 		Item item = queue[index];
 		queue[index] = queue[--size];			//to avoid loitering
 		queue[size] = null;
-		queue[index] = null;
-		size--;
+		//queue[index] = null;
+		//size--;
 		
 		if(size > 0 && size == queue.length/4) {
 			resize(queue.length/2);
@@ -111,8 +111,8 @@ public class RandomizedQueue<Item> {
 		
 		public RandomizedQueueIterator() {
 			clonedIndices = new int[size];
-			for(int i = 0; i < queue.length; i++) {
-				clonedIndices[index] = i;
+			for(int i = 0; i < size; i++) {
+				clonedIndices[i] = i;
 			}
 			StdRandom.shuffle(clonedIndices);
 		}
@@ -133,7 +133,6 @@ public class RandomizedQueue<Item> {
 			
 		}
 		
-		@Override
 		public void remove() {
 	    	 throw new UnsupportedOperationException("Remove operation not supported"
 		    	 		+ " in this version.");  			
